@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
-import { View, Text, Image, StyleSheet, TextInput, Navigator, AsyncStorage } from 'react-native';
+import { View, Text, Image, StyleSheet, TextInput, Navigator, AsyncStorage, Dimensions, ScrollView } from 'react-native';
 import Button from './../components/Button';
 import {q, db} from './../firebaseConfig';
+
+const width = Dimensions.get('window').width;
+const height = Dimensions.get('window').height;
 
 export default class Login extends Component {
   constructor() {
@@ -12,9 +15,6 @@ export default class Login extends Component {
       errorMessage: '',
       user: ''
     };
-  }
-  componentWillMount() {
-
   }
 
 
@@ -28,39 +28,39 @@ export default class Login extends Component {
   }
   handleLogin() {
 
-    q.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(function(error){
-      let errorMessage = error.message;
-      this.setState({errorMessage});
+   q.auth().signOut().then(function() {
+
+   }, function(error) {
+
+   });
+   q.auth().signInWithEmailAndPassword(this.state.email, this.state.password).catch(function(error){
+      this.setState({errorMessage: error.message});
+    }.bind(this));
+    
+    q.auth().onAuthStateChanged(function(user){
+      if(user !== null) {
+          let data = {
+            loggedIn: true,
+            name: user.displayName,
+            email: user.email,
+            id: user.uid
+          }
+          AsyncStorage.setItem('@superStore:user', JSON.stringify(data));
+          this.props.navigator.immediatelyResetRouteStack([{id: 'timeline'}]);
+      }
     }.bind(this))
 
-    alert('Hit');
-
-    q.auth().onAuthStateChanged((user) => {
-        if (user) {
-            // alert(user.displayName + user.uid);
-            let data = {
-                name: user.displayName,
-                email: user.email,
-                uid: user.uid,
-                loggedIn: true
-            }
-            AsyncStorage.setItem('@superStore:user', JSON.stringify(data));
-            this.props.navigator.push({
-                id: 'dashboard'
-            });
-        }
-    })
 
   }
 
   render() {
     return (
-      <View style={styles.container}>
+      <Image style={styles.container} source={require('./../images/restaurant.png')}>
         <Image source={require('./../images/logo.png')} style={styles.logo}/>
         <Text style={{textAlign: 'center', fontWeight: 'bold', paddingRight: 20, paddingLeft: 20}}>{this.state.errorMessage}</Text>
-        <View style={styles.signupContainer}>
+        <ScrollView style={styles.signupContainer}>
           <TextInput
-            placeholder="Enter Email..."
+            placeholder="Enter email..."
             keyboardType="email-address"
             onChangeText={(email) => this.setState({email})}
             style={styles.myinput}
@@ -73,10 +73,10 @@ export default class Login extends Component {
           ></TextInput>
         <Text>{this.state.user}</Text>
         <Button onPressButton={this.handleLogin.bind(this)} btnStyle={[styles.btn, styles.login]}>Login</Button>
-        <Button btnStyle={styles.goto} onPressButton={this.goToSignup.bind(this)}>Don't have an account?</Button>
+        <Button btnStyle={styles.goto} onPressButton={this.goToSignup.bind(this)}>Dont have an account?</Button>
 
-        </View>
-      </View>
+        </ScrollView>
+      </Image>
     )
   }
 };
@@ -84,9 +84,10 @@ export default class Login extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ff7473',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    width: width,
+    height: height
   },
   goto: {
     textAlign: 'center',

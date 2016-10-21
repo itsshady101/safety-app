@@ -13,43 +13,29 @@ import Splash from './src/pages/Splash';
 import Login from './src/pages/Login';
 import Signup from './src/pages/Signup';
 import Role from './src/pages/Role';
-import Dashboard from './src/pages/Dashboard';
 import AddParent from './src/pages/Add';
 import Help from './src/pages/Help';
 import Timeline from './src/pages/Timeline';
+import Main from './src/pages/Main';
+import News from './src/pages/News';
+import Single from './src/pages/Single';
+import Profile from './src/pages/Profile';
 
 class login extends Component {
 
+
   constructor() {
     super();
-    AsyncStorage.getItem('@superStore:user', (err, result) => {
-      let user = JSON.parse(result);
-      if(user) {
-        if (user.loggedIn) {
-            this.initialRoute = 'dashboard';
-        }
-      }
-    })
+
   }
 
-  endme() {
-    AsyncStorage.getItem('@superStore:user', (err, result) => {
-      let user = JSON.parse(result);
-      if (user.loggedIn) {
-        alert('looged');
-        return 'dashboard';
-      } else {
-        return 'splash';
-      }
-    })
-  }
 
   render() {
 
-return (
+    return (
       <Navigator
         initialRoute = {{
-          id: 'timeline'
+          id: 'main'
         }}
         renderScene={
           this.navigatorRenderScene
@@ -60,6 +46,8 @@ return (
   navigatorRenderScene(route, navigator) {
     _navigator = navigator;
     switch (route.id) {
+      case 'main':
+        return(<Main navigator={navigator} />);
       case 'splash':
         return(<Splash navigator={navigator} />);
       case 'login':
@@ -76,6 +64,12 @@ return (
         return(<Help navigator={navigator} />);
       case 'timeline':
         return(<Timeline navigator={navigator} />);
+      case 'news':
+        return(<News navigator={navigator} />);
+      case 'single':
+        return(<Single navigator={navigator} {...route.passProps} />);
+      case 'profile':
+        return(<Profile navigator={navigator} />);
     }
   }
 }

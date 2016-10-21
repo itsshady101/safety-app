@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, Image, Text, StyleSheet, Navigator, AsyncStorage, TextInput } from 'react-native';
 import Button from './../components/Button';
-import q from '../firebaseConfig';
+import {q, db} from '../firebaseConfig';
 
 export default class Role extends Component {
   constructor() {
@@ -17,7 +17,6 @@ export default class Role extends Component {
   }
   componentWillMount() {
     AsyncStorage.getItem('@superStore:user', function(error, result){
-      alert(result);
     }.bind(this));
 
   }
@@ -27,18 +26,25 @@ export default class Role extends Component {
     user.updateProfile({
       displayName: this.state.name
     }).then(function(){
+      let dbData = {
+          email : q.auth().currentUser.email,
+          name: q.auth().currentUser.displayName,
+      }
+
+      let uid = q.auth().currentUser.uid;
+
+      db.ref('users/' + q.auth().currentUser.uid).set(dbData);
+
       let data = {
         loggedIn: true,
-        email: user.email,
-        name: this.state.name
+        email: dbData.email,
+        name: this.state.name,
+        id: uid,
       }
-      AsyncStorage.removeItem('@superStore:user', function(error) {
-        alert(error);
-      })
       AsyncStorage.setItem('@superStore:user', JSON.stringify(data));
-      this.props.navigator.push({
-        id: 'dashboard'
-      })
+      this.props.navigator.immediatelyResetRouteStack([{
+        id: 'timeline'
+      }])
     }.bind(this), function(error){
       alert('Cant sign in try later.');
     })

@@ -25,7 +25,6 @@ export default class Header extends Component {
         return (
             <Image source={require('../images/bg.jpg')} style={styles.hero}>
 
-                <TouchableHighlight style={{position: 'absolute', top:20, left: 20}} onPress={()=> this.refs['DRAWER_REF'].openDrawer()}>{menuIcon}</TouchableHighlight>
                 <View style={styles.content}>
                     {AvatarIcon}
                     <Text style={styles.heading2}>Welcome, {this.props.children}</Text>

@@ -6,9 +6,15 @@ import {
     StyleSheet,
     AsyncStorage,
     Navigator,
+    Dimensions,
     TouchableHighlight
 } from 'react-native';
 import Button from './../components/Button';
+
+import general from './../general/mainStyle';
+
+var width = Dimensions.get('window').width;
+var height = Dimensions.get('window').height;
 
 export default class Splash extends Component {
   constructor() {
@@ -27,33 +33,18 @@ export default class Splash extends Component {
     });
   }
 
-  blah() {
-    AsyncStorage.setItem('@superStore:user', 'user');
-  }
-
-  tantan() {
-    AsyncStorage.getItem('@superStore:user', (err, result) => {
-      alert(result);
-    })
-  }
 
   render() {
 
     return (
-      <View style={styles.container}>
+      <Image style={styles.container} source={require('./../images/s1.jpg')}>
         <Image source={require('./../images/logo.png')} style={styles.logo}/>
         <Text style={styles.lead}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla malesuada at tellus imperdiet iaculis. </Text>
         <View style={styles.cta}>
           <Button onPressButton={this.goToSignup.bind(this)} btnStyle={[styles.btn, styles.signup]} elevation={5}>Signup</Button>
           <Button onPressButton={this.goToLogin.bind(this)} btnStyle={[styles.btn, styles.login]}>Login</Button>
         </View>
-        <TouchableHighlight onPress={this.blah.bind(this)}>
-          <Text>Set</Text>
-        </TouchableHighlight>
-        <TouchableHighlight onPress={this.tantan.bind(this)}>
-          <Text>Get</Text>
-        </TouchableHighlight>
-      </View>
+      </Image>
     )
   }
 }
@@ -61,17 +52,16 @@ export default class Splash extends Component {
 const styles = StyleSheet.create({
     container: {
       flex: 1,
+      width: width,
+      height: height,
       justifyContent: 'center',
-      alignItems: 'center',
-      paddingRight: 30,
-      paddingLeft: 30,
-      backgroundColor: '#47b8e0'
+      alignItems: 'center'
     },
     logo: {
       marginBottom: 20,
-      resizeMode: 'contain',
-      height: 150,
       flex: .3,
+      resizeMode: 'contain',
+      height: 120,
       marginTop: 50
     },
     bigHeading: {

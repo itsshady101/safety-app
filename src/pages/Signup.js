@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
-import { View, Text, Image, StyleSheet, TextInput, Navigator, AsyncStorage } from 'react-native';
+import { View, Text, Image, StyleSheet, TextInput, Navigator, AsyncStorage, Dimensions } from 'react-native';
 import Button from './../components/Button';
-import q from './../firebaseConfig';
+import {q, db} from './../firebaseConfig';
+
+const width = Dimensions.get('window').width;
+const height = Dimensions.get('window').height;
 
 
 export default class Signup extends Component {
@@ -17,26 +20,36 @@ export default class Signup extends Component {
   handleSignup() {
     let email = this.state.email;
     let password = this.state.password;
-    q.auth().createUserWithEmailAndPassword(email, password).catch(function(error, user){
+    q.auth().createUserWithEmailAndPassword(email, password).catch(function(error){
       // Handle errors
+      q.auth().signOut().then(function() {
+
+      }, function(error) {
+
+      });
       let errorCode = error.code;
       let errorMessage = error.message;
       this.setState({errorMessage});
-    }.bind(this));
 
-    q.auth().onAuthStateChanged(function(user){
-      if (user) {
+    }.bind(this));
+    
+    let user = q.auth().currentUser; 
+    alert(JSON.stringify(user));
+      /* if(user !== null) {
+
         let data = {
           loggedIn: true,
-          email: user.email
-        };
+          name: user.displayName,
+          email: user.email,
+          id: user.uid
+        }
         AsyncStorage.setItem('@superStore:user', JSON.stringify(data));
-        this.props.navigator.push({
-          id: 'role'
-        });
-      }
-    }.bind(this));
+        this.props.navigator.immediatelyResetRouteStack([{id: 'role'}]);
+    } */
+    
+
   }
+
   kill() {
     this.props.navigator.push({
       id: 'role'
@@ -49,7 +62,7 @@ export default class Signup extends Component {
   }
   render() {
     return (
-      <View style={styles.container}>
+      <Image style={styles.container} source={require('./../images/s2.png')}>
         <Image source={require('./../images/logo.png')} style={styles.logo}/>
         <Text style={{textAlign: 'center', fontWeight: 'bold',paddingRight: 20, paddingLeft: 20}}>{this.state.errorMessage}</Text>
         <View style={styles.signupContainer}>
@@ -69,7 +82,7 @@ export default class Signup extends Component {
         <Button btnStyle={styles.goto} onPressButton={this.goToLogin.bind(this)}>Already have an account?</Button>
         <Text>{this.state.user}</Text>
         </View>
-      </View>
+      </Image>
     )
   }
 };
@@ -79,7 +92,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#ff7473',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    width: width,
+    height: height
   },
   goto: {
     textAlign: 'center',

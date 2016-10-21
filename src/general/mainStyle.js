@@ -30,6 +30,7 @@ heading2: {
 button: {
     paddingTop: 10,
     paddingBottom: 10,
+    textAlign: 'center',
     paddingRight: 30,
     paddingLeft: 30,
     elevation: 10,
@@ -39,7 +40,14 @@ button: {
 blue: {
     backgroundColor: '#34314c',
     color: '#fff'
-}
+},
+
+padding: {
+    padding: 20,
+    borderBottomWidth: 1,
+    borderColor: 'rgba(0,0,0,0.1)'
+},
+
 }))
 
 export default general;

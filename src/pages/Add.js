@@ -4,11 +4,19 @@ import {
     Text,
     TextInput,
     AsyncStorage,
+    TouchableOpacity,
+    ToolbarAndroid,
+    DrawerLayoutAndroid,
+    Dimensions,
     StyleSheet
 } from 'react-native';
 import Button from './../components/Button';
 import {q, db} from './../firebaseConfig.js';
 import general from './../general/mainStyle'
+import Icon from 'react-native-vector-icons/FontAwesome';
+
+const width = Dimensions.get('window').width;
+
 export default class AddParent extends Component {
     
     constructor() {
@@ -61,6 +69,7 @@ export default class AddParent extends Component {
         var parentIds = [];
         db.ref('/users/' + loggedInAs + '/parent/').once('value', (snapshot) => {
             var obj = snapshot.val();
+            if(obj) {
             parentIds = Object.keys(obj);
             var emails = [];
             var names = [];
@@ -76,23 +85,74 @@ export default class AddParent extends Component {
 
                 alert(this.names.length + this.emails.length);
             })
+            }
         })
 
     }
 
+    signout() {
+      asyncstorage.removeitem('@superstore:user', (error) => {
+          if(error) {
+              alert(error);
+          }
+      })
+      this.props.navigator.immediatelyresetroutestack([{id: 'splash'}]);
+    }
+    
     render() {
+         
+        var navMenu = (
+            <View style={{flex: 1, backgroundColor: '#fff'}}>
+                <View style={{}, general.padding}>
+                    <TouchableOpacity onPress={() => this.props.navigator.push({id: 'timeline'})}><Text style={[{fontSize: 20}, general.brandon]}><Icon name="home" size={23} color="#777" />   Home</Text></TouchableOpacity>
+                </View>
+                <View style={{}, general.padding}>
+                    <TouchableOpacity onPress={() => this.props.navigator.push({id: 'help'})}><Text style={[{fontSize: 20}, general.brandon]}><Icon name="exclamation-triangle" size={23} color="#777" />   Alert</Text></TouchableOpacity>
+                </View>
+
+                <View style={{}, general.padding}>
+                    <TouchableOpacity onPress={() => this.props.navigator.push({id: 'add'})}><Text style={[{fontSize: 20}, general.brandon]}><Icon name="user-plus" size={23} color="#777" />  Add Another Guardian</Text></TouchableOpacity>
+                </View>
+                
+                <View style={general.padding}>
+                    <TouchableOpacity onPress={() => this.props.navigator.push({id: 'news'})}><Text style={[{fontSize: 20}, general.brandon]}><Icon name="newspaper-o" size={23} color="#777" />  News and Alerts</Text></TouchableOpacity>
+                </View>
+
+                <View style={general.padding}>
+                    <TouchableOpacity onPress={this.signout.bind(this)}><Text style={[{fontSize: 20}, general.brandon]}><Icon name="sign-out" size={23} color="#777" />  Logout</Text></TouchableOpacity>
+                </View>
+
+            </View>
+        );
+
         return (
-            <View style={general.container}>
+
+        <DrawerLayoutAndroid
+          drawerWidth={width}
+          ref='DRAWER'
+          drawerPosition={DrawerLayoutAndroid.positions.Left}
+          renderNavigationView={() => { return(this.navMenu)}}>
+
+            <ToolbarAndroid
+              title="ASAP"
+              titleColor="#fff"
+              style={{ height: 50, backgroundColor: '#34314c', elevation: 5}}
+              navIcon={require('./../images/menu.png')}
+              onIconClicked={()=> this.refs['DRAWER'].openDrawer()}
+              />
+
+            <View style={[general.container, {backgroundColor: '#fff'}]}>
                 <View style={general.content}> 
-                    <Text style={[general.heading, general.brandon, general.heading1]}>YO! BOI!</Text>
+                    <Text style={[general.heading, general.brandon, general.heading1]}>Add A Guardian</Text>
                     <TextInput placeholder={"Add id."} onChangeText={(text) => this.setState({idToFind: text})} />
                     <Button onPressButton={this.find.bind(this)}>Find</Button>
 
                    
                     {<UserCard user={this.state.found} add={this.addParent.bind(this)} />}
-                    <Text>{this.parentNames.length}</Text>
+                    {/* <Text>{this.parentNames.length}</Text> */}
                 </View>
             </View>
+        </DrawerLayoutAndroid>
         )
     }
 }
